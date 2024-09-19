@@ -18,7 +18,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Google Calendar Event!</title>
+    <title>Create Google Calendar Event</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
@@ -49,7 +49,6 @@
         }
 
         function signOut() {
-            // Sign out logic
             google.accounts.id.revoke(accessToken, function(response) {
                 console.log("User signed out");
                 accessToken = null;
@@ -79,6 +78,11 @@
                     ],
                 },
             };
+
+            if (!accessToken) {
+                console.error("Access token is missing");
+                return;
+            }
 
             fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
                 method: 'POST',
