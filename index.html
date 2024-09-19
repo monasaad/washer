@@ -1,18 +1,3 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Google Calendar Event</title>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-</head>
-<body>
-    <h1>Create Google Calendar Event</h1>
-    <button id="authorize_button">Authorize</button>
-    <button id="signout_button" style="display: none;">Sign Out</button>
-    <button id="create_event_button" style="display: none;">Create Event</button>
-    <script src="script.js"></script>
-</body>-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,7 +15,7 @@
     <div class="g_id_signin" data-type="standard"></div>
 
     <button id="signout_button" style="display: none;" onclick="signOut()">Sign Out</button>
-    <button id="create_event_button" style="display: none;" onclick="createEvent()">Create Event</button>
+    <button id="create_event_button" style="display: none;" onclick="createGoogleCalendarEvent()">Create Event</button>
 
     <script>
         let accessToken;
@@ -57,7 +42,7 @@
             });
         }
 
-        function createEvent() {
+        function createGoogleCalendarEvent() {
             const event = {
                 'summary': 'Google I/O 2023',
                 'location': '800 Howard St., San Francisco, CA 94103',
