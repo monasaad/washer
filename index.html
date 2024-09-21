@@ -3,87 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Google Calendar Event</title>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <title>Washers & Dryers Machine Calender</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
-    <h1>Create Google Calendar Event</h1>
-    <div id="g_id_onload"
-         data-client_id="455548840988-s4vll97i9q38ro6htvgb7ps6uqu8n0ak.apps.googleusercontent.com"
-         data-callback="handleCredentialResponse">
-    </div>
-    <div class="g_id_signin" data-type="standard"></div>
-
-    <button id="signout_button" style="display: none;" onclick="signOut()">Sign Out</button>
-    <button id="create_event_button" style="display: none;" onclick="createGoogleCalendarEvent()">Create Event</button>
+    <button id="create-ics">Create W1 Event</button>
 
     <script>
-        let accessToken;
+        document.getElementById('create-ics').addEventListener('click', function() {
+            // Get current date and time
+            const startTime = new Date();
+            const endTime = new Date(startTime);
+            endTime.setHours(endTime.getHours() + 1); // 1 hour later
 
-        function handleCredentialResponse(response) {
-            const id_token = response.credential;
-            console.log("ID Token: " + id_token);
-            // Exchange ID token for access token
-            fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + id_token)
-                .then(res => res.json())
-                .then(data => {
-                    accessToken = data.sub; // Use the user ID or other data as needed
-                    document.getElementById('signout_button').style.display = 'inline';
-                    document.getElementById('create_event_button').style.display = 'inline';
-                });
-        }
+            // Format date and time for ICS
+            const dtstamp = formatDateForICS(startTime);
+            const dtstart = formatDateForICS(startTime);
+            const dtend = formatDateForICS(endTime);
 
-        function signOut() {
-            google.accounts.id.revoke(accessToken, function(response) {
-                console.log("User signed out");
-                accessToken = null;
-                document.getElementById('signout_button').style.display = 'none';
-                document.getElementById('create_event_button').style.display = 'none';
-            });
-        }
+            // Create ICS content
+            const icsContent = `BEGIN:VCALENDAR
+                                VERSION:2.0
+                                PRODID:-//Your Organization//Your Product//EN
+                                METHOD:PUBLISH
+                                BEGIN:VEVENT
+                                UID:${dtstart}@yourdomain.com
+                                DTSTAMP:${dtstamp}
+                                DTSTART:${dtstart}
+                                DTEND:${dtend}
+                                SUMMARY:Dynamic Event
+                                DESCRIPTION:This event was created dynamically.
+                                STATUS:CONFIRMED
+                                END:VEVENT
+                                END:VCALENDAR`;
 
-        function createGoogleCalendarEvent() {
-            const event = {
-                'summary': 'Google I/O 2023',
-                'location': '800 Howard St., San Francisco, CA 94103',
-                'description': 'A chance to hear more about Google\'s developer products.',
-                'start': {
-                    'dateTime': '2023-09-30T09:00:00-07:00',
-                    'timeZone': 'America/Los_Angeles',
-                },
-                'end': {
-                    'dateTime': '2023-09-30T17:00:00-07:00',
-                    'timeZone': 'America/Los_Angeles',
-                },
-                'reminders': {
-                    'useDefault': false,
-                    'overrides': [
-                        {'method': 'email', 'minutes': 24 * 60},
-                        {'method': 'popup', 'minutes': 10},
-                    ],
-                },
-            };
+            // Create a blob and generate a download link
+            const blob = new Blob([icsContent], { type: 'text/calendar' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'event.ics';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url); // Clean up
+        });
 
-            if (!accessToken) {
-                console.error("Access token is missing");
-                return;
-            }
-
-            fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + accessToken,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(event),
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log("Event created: ", data);
-            })
-            .catch(error => {
-                console.error("Error creating event: ", error);
-            });
+        function formatDateForICS(date) {
+            return date.toISOString().replace(/[-:]/g, '').split('.')[0]; // Format: YYYYMMDDTHHMMSS
         }
     </script>
 </body>
