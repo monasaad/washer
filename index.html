@@ -43,7 +43,9 @@
             const dtstamp = formatDateForICS(startTime);
             const dtstart = formatDateForICS(startTime);
             const dtend = formatDateForICS(endTime);
-
+// Timezone specification for Saudi Arabia
+            const timeZone = 'Asia/Riyadh';
+            
             return `BEGIN:VCALENDAR\r\n
 VERSION:2.0\r\n
 PRODID:-//Your Organization//Your Product//EN\r\n
