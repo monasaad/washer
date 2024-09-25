@@ -29,7 +29,7 @@
     </style>
 </head>
 <body>
-    <h1>Create ICS Events</h1>
+    <h1>Create ICS Events1</h1>
 
     <div id="buttons-container"></div>
 
@@ -53,8 +53,8 @@ METHOD:PUBLISH\r\n
 BEGIN:VEVENT\r\n
 UID:${dtstart}@yourdomain.com\r\n
 DTSTAMP:${dtstamp}\r\n
-DTSTART:${dtstart}\r\n
-DTEND:${dtend}\r\n
+DTSTART;TZID=${timeZone}:${dtstart}\r\n
+DTEND;TZID=${timeZone}:${dtend}\r\n
 SUMMARY:${eventName}\r\n
 DESCRIPTION:${description}\r\n
 STATUS:CONFIRMED\r\n
