@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Washers & Dryers Machine Calender</title>
+    <title>Create ICS Events</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             height: 100vh;
             background-color: #f4f4f4;
@@ -21,6 +21,7 @@
             color: white;
             border: none;
             border-radius: 5px;
+            margin: 5px; /* Space between buttons */
         }
         button:hover {
             background-color: #45a049;
@@ -28,51 +29,71 @@
     </style>
 </head>
 <body>
-    <button id="create-ics">Create W1 Event</button>
+    <h1>Create ICS Events</h1>
+
+    <div id="buttons-container"></div>
 
     <script>
-        document.getElementById('create-ics').addEventListener('click', function() {
-            // Get current date and time
+        // Function to create ICS content
+        function createICS(eventName, description) {
             const startTime = new Date();
             const endTime = new Date(startTime);
-            endTime.setHours(endTime.getHours() + 1); // 1 hour later
+            endTime.setMinutes(endTime.getMinutes() + 40); // 40 minutes later
 
-            // Format date and time for ICS
             const dtstamp = formatDateForICS(startTime);
             const dtstart = formatDateForICS(startTime);
             const dtend = formatDateForICS(endTime);
 
-            // Create ICS content
-            const icsContent = `BEGIN:VCALENDAR
-                                VERSION:2.0
-                                PRODID:-//Your Organization//Your Product//EN
-                                METHOD:PUBLISH
-                                BEGIN:VEVENT
-                                UID:${dtstart}@yourdomain.com
-                                DTSTAMP:${dtstamp}
-                                DTSTART:${dtstart}
-                                DTEND:${dtend}
-                                SUMMARY:"Washer W1" // The machine name
-                                DESCRIPTION:This event was created dynamically.
-                                STATUS:CONFIRMED
-                                END:VEVENT
-                                END:VCALENDAR`;
+            return `BEGIN:VCALENDAR\r\n
+VERSION:2.0\r\n
+PRODID:-//Your Organization//Your Product//EN\r\n
+METHOD:PUBLISH\r\n
+BEGIN:VEVENT\r\n
+UID:${dtstart}@yourdomain.com\r\n
+DTSTAMP:${dtstamp}\r\n
+DTSTART:${dtstart}\r\n
+DTEND:${dtend}\r\n
+SUMMARY:${eventName}\r\n
+DESCRIPTION:${description}\r\n
+STATUS:CONFIRMED\r\n
+BEGIN:VALARM\r\n
+TRIGGER:-PT5M\r\n
+DESCRIPTION:Reminder for ${eventName}\r\n
+ACTION:DISPLAY\r\n
+END:VALARM\r\n
+END:VEVENT\r\n
+END:VCALENDAR`;
+        }
 
-            // Create a blob and generate a download link
-            const blob = new Blob([icsContent], { type: 'text/calendar' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'event.ics';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url); // Clean up
-        });
-
+        // Function to format date for ICS
         function formatDateForICS(date) {
             return date.toISOString().replace(/[-:]/g, '').split('.')[0]; // Format: YYYYMMDDTHHMMSS
         }
+
+        // Function to create a button
+        function createButton(eventName, description, buttonText) {
+            const button = document.createElement('button');
+            button.textContent = buttonText;
+            button.addEventListener('click', function() {
+                const icsContent = createICS(eventName, description);
+                const dataUri = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(icsContent);
+
+                const a = document.createElement('a');
+                a.href = dataUri;
+                a.download = `${eventName.replace(/\s+/g, '_')}.ics`; // Filename replaces spaces with underscores
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            });
+            return button;
+        }
+
+        // Create buttons and append to container
+        const buttonsContainer = document.getElementById('buttons-container');
+        buttonsContainer.appendChild(createButton("W1 Washer", "Machine has started and will end within 40 mins", "W1 Washer"));
+        buttonsContainer.appendChild(createButton("W2 Washer", "Machine has started and will end within 40 mins", "W2 Washer"));
+        buttonsContainer.appendChild(createButton("D1 Dryer", "Machine has started and will end within 40 mins", "D1 Dryer"));
+        buttonsContainer.appendChild(createButton("D2 Dryer", "Machine has started and will end within 40 mins", "D2 Dryer"));
     </script>
 </body>
 </html>
